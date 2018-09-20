@@ -28,14 +28,17 @@ class TvRoomSwitch(hass.Hass):
     def handleSingleClick(self):
         self.log("Handle single click...")
 
-        matches = [key for key in self.brighnessStrategies if self.brighnessStrategies[key](self)]
-
-        self.brighnessStrategyHandlers[matches[0]](self) if len(matches) > 0 else self.handleDefault()
+        matches = [key for key in self.brighnessStrategies if self.brighnessStrategies[key]['fn'](self)]
+        sortedMatches = sorted(matches, key=lambda x: self.brighnessStrategies[x]['order'])
         
+        self.log(sortedMatches)
+        self.brighnessStrategyHandlers[sortedMatches[0]](self) if len(sortedMatches) > 0 else self.handleDefault()
 
     def handleDoubleClick(self):
         self.log("Handle double click...")
+        
         self.turn_on("group.tv_room_rgb_lights", color_name=self.colors[self.colorCounter])
+
         self.colorCounter = self.colorCounter + 1 if self.colorCounter < len(self.colors) - 1 else 0
 
     def onOffStrategy(self):
@@ -53,6 +56,8 @@ class TvRoomSwitch(hass.Hass):
         return False
 
     def cozyStrategy(self):
+        self.log(self.sun_down())
+        self.log(self.sunrise())
         return self.sun_down()
 
     def handleDimmableStrategies(self, brightnesses):
@@ -83,8 +88,8 @@ class TvRoomSwitch(hass.Hass):
         self.handleDimmableStrategies(["0", "50", "100"])
 
     brighnessStrategies = {
-        "cozy": cozyStrategy,
-        "on_off" : onOffStrategy
+        "on_off" : { "order": 1, "fn": onOffStrategy },
+        "cozy": { "order": 2, "fn": cozyStrategy }
     }
 
     brighnessStrategyHandlers = {
