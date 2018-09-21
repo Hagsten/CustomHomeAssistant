@@ -51,7 +51,7 @@ class TvRoomMotion(hass.Hass):
 
   def no_motion(self, entity, attribute, old, new, kwargs):
     if self.noMotionTimer is not None:
-          self.noMotionTimer.cancel()
+          return
 
     timerDuration = 300.0 if datetime.datetime.now().hour >= 0 and datetime.datetime.now().hour <= 5 else 1800.0
 
