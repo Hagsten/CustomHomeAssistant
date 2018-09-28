@@ -20,6 +20,7 @@ class TvRoomMotion(hass.Hass):
   def motion(self, entity, attribute, old, new, kwargs):
       if self.noMotionTimer is not None:
           self.noMotionTimer.cancel()
+          self.noMotionTimer = None
 
       if self.thresholdReachedAt is None:
         return
@@ -39,14 +40,9 @@ class TvRoomMotion(hass.Hass):
         self.turn_on("script.1536574687151")
 
   def interpretIllumination(self, illumination):
-        self.log("Illumination: ")
-        self.log(illumination)
-        
         if float(illumination) >= 9.0:
-              self.log("Value above theshold, reset timer")
               self.thresholdReachedAt = None
         elif self.thresholdReachedAt is None:
-              self.log("Value below theshold, set timer to now")
               self.thresholdReachedAt = datetime.datetime.now()
 
   def no_motion(self, entity, attribute, old, new, kwargs):
@@ -55,16 +51,14 @@ class TvRoomMotion(hass.Hass):
 
     timerDuration = 300.0 if datetime.datetime.now().hour >= 0 and datetime.datetime.now().hour <= 5 else 1800.0
 
-    self.log("Motion cleared, setting timer to ")
-    self.log(timerDuration)
-
     self.noMotionTimer = Timer(timerDuration, self.no_motion_cb)
     self.noMotionTimer.start()
 
   def no_motion_cb(self):
     self.log("Timer complete, trying to turn off lights...")
+    self.log(self.get_state("media_player.vardagsrum"))
 
-    if self.get_state("media_player.vardagsrum") == "off":
+    if self.get_state("media_player.vardagsrum").lower() == "off":
       return
 
     self.turn_off("group.tv_room_rgb_lights")
