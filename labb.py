@@ -17,7 +17,6 @@ class Labb(hass.Hass):
         self.log("Alarmsystem up and running. Is armed: {}".format(self.armed))
         #self.utils.alarm_flash()
 
-        self.log(self.get_state("light.gateway_light_7811dcdf0cfa",attribute="all"))
 
     def leavingHome(self, entity, attribute, old, new, kwargs):
         self.arm()
@@ -32,7 +31,6 @@ class Labb(hass.Hass):
         self.armed = True
         self.log("Armed")
         self.utils.send_notification("Test: Larm aktiverat", "Test: Orsak - antas sova")
-        self.utils.flash_lights_long("group.all_lights", "red")
 
     def disarm(self):
         if not self.armed:
@@ -41,4 +39,3 @@ class Labb(hass.Hass):
         self.armed = False
         self.log("Disarmed")
         self.utils.send_notification("Test: Larm deaktiverat", "Test: Orsak - antas ha vaknat")
-        self.utils.flash_lights_long("group.all_lights", "green")

@@ -12,12 +12,17 @@ class asleep_2(hass.Hass):
         self.listen_state(self.handleMotionDetected, "group.motion_sensors", new = "on")
         self.asleep = False
 
+        self.log("Asleep up and running")
+
     def handleMotionCleared(self, event_name, data, foo, bar, baz):
         if not self.utils.anyone_home():
             return
 
-        #if datetime.datetime.now().hour >= 7 and datetime.datetime.now().hour <= 21:
-            #return
+        if self.asleep:
+            return
+
+        if datetime.datetime.now().hour >= 7 and datetime.datetime.now().hour <= 19:
+            return
 
         sortedSensors = self.getMotionSensors()
         
@@ -51,6 +56,7 @@ class asleep_2(hass.Hass):
                 subsc()
 
     def registerWentToSleep(self, cb):
+        self.log(self.wentToSleepSubscribers)
         self.wentToSleepSubscribers.append(cb)
 
     def registerWokeUp(self, cb):
