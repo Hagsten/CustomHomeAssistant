@@ -7,6 +7,7 @@ class TvRoomMotion(hass.Hass):
   noMotionTimer = None
 
   def initialize(self):
+    self.lights = self.get_app('lights')
     self.interpretIllumination(self.get_state("sensor.illumination_158d00023db75a"))
 
     self.listen_state(self.motion, "binary_sensor.motion_sensor_158d00023db75a", new = "on")
@@ -37,6 +38,7 @@ class TvRoomMotion(hass.Hass):
 
       if shouldTrigger:
         self.log("Run script to turn on lights")
+        #Only place from appdaemon that does not go through Lights class - consider moving script to an app
         self.turn_on("script.1536574687151")
 
   def interpretIllumination(self, illumination):
@@ -61,5 +63,5 @@ class TvRoomMotion(hass.Hass):
     if self.get_state("media_player.vardagsrum").lower() == "off":
       return
 
-    self.turn_off("group.tv_room_rgb_lights")
+    self.lights.turn_off("group.tv_room_rgb_lights")
 

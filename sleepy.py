@@ -1,15 +1,21 @@
 import appdaemon.plugins.hass.hassapi as hass
 import datetime
 
-class asleep_2(hass.Hass):
-    wentToSleepSubscribers = []
-    wokeUpSubscribers = []
+class Sleepy(hass.Hass):
+    wentToSleepSubscribers = {}
+    wokeUpSubscribers = {}
 
     def initialize(self):
         self.utils = self.get_app('utils')
         
         self.listen_state(self.handleMotionCleared, "binary_sensor.motion_sensor_upper_floor", new = "off")
         self.listen_state(self.handleMotionDetected, "group.motion_sensors", new = "on")
+
+        #Listen to a IFTTT battery charging event. If the below conditions are met + battery is charging then apply a more offensive strategy (the current)
+        #else wait at least double the time to activate the alarm
+
+        #If it is in the middle of the night we can ignore this and apply the offensive strategy since one would not unplug the phone when going to the bathroom.
+
         self.asleep = False
 
         self.log("Asleep up and running")
@@ -36,8 +42,8 @@ class asleep_2(hass.Hass):
 
         self.asleep = True
 
-        for subsc in self.wentToSleepSubscribers:
-            subsc()
+        for key in self.wentToSleepSubscribers:
+            self.wentToSleepSubscribers[key]()
 
     def handleMotionDetected(self, event_name, data, old, new, handle):
         if not self.utils.anyone_home():
@@ -52,15 +58,15 @@ class asleep_2(hass.Hass):
             self.asleep = False
             self.log("Calling waking up subscribers...")
 
-            for subsc in self.wokeUpSubscribers:
-                subsc()
+            for key in self.wokeUpSubscribers:
+                self.wokeUpSubscribers[key]()
 
-    def registerWentToSleep(self, cb):
+    def registerWentToSleep(self, key, cb):
         self.log(self.wentToSleepSubscribers)
-        self.wentToSleepSubscribers.append(cb)
+        self.wentToSleepSubscribers[key] = cb
 
-    def registerWokeUp(self, cb):
-        self.wokeUpSubscribers.append(cb)
+    def registerWokeUp(self, key, cb):
+        self.wokeUpSubscribers[key] = cb
 
     def getMotionSensors(self):
         motionSensors = [self.get_state(x, attribute="all") for x in self.get_state("group.motion_sensors", attribute="entity_id")]

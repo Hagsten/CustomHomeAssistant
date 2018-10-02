@@ -1,30 +1,24 @@
+
 import appdaemon.plugins.hass.hassapi as hass
 import datetime
-import asleep
 from threading import Timer
 
 class Doorbell(hass.Hass):
-    sleepCheck = asleep.Asleep()
     timer = None
-    motionSensors = None
 
     def initialize(self):
+        self.asleep = self.get_app('asleep')
+        self.lights = self.get_app('lights')
         self.listen_event(self.buttonListener, event="click", entity_id="binary_sensor.switch_doorbell")
-        sensorNames = self.get_state("group.motion_sensors", attribute="entity_id")
-        self.log(sensorNames)
-        self.motionSensors = [self.get_state(x, attribute="all") for x in sensorNames]
-        self.log(self.motionSensors)
         self.log("Doorbell app is running...")
 
     def buttonListener(self, event_name, data, foo):
-        #self.log(self.get_state("binary_sensor.motion_sensor_upper_floor", attribute="all"))
-
-        if self.sleepCheck.is_asleep():
+        if self.asleep.is_asleep:
             self.call_service("script/1537340978223", ringtone=10, volume=10)
         else:
             self.call_service("script/1537340978223", ringtone=10, volume=50)
 
-        self.turn_on("group.hallway_lights")
+        self.lights.turn_on("group.hallway_lights")
 
         if self.timer is not None:
             self.timer.cancel()
@@ -37,4 +31,4 @@ class Doorbell(hass.Hass):
 
     def turnOffLights(self):
         self.log("turning lights off...")
-        self.turn_off("group.hallway_lights")
+        self.lights.turn_off("group.hallway_lights")
