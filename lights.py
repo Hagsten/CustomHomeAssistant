@@ -91,9 +91,8 @@ class Lights(hass.Hass):
             }
 
             self.parent.log("EntityId: {}: current value {}".format(self.entity_id, self.current))
-            #TODO: fix rgb_color
-            self.parent.turn_on(self.entity_id, brightness_pct=brightness, color_name=color_name, kelvin=kelvin)
-            
+
+            self.__turn_on__(brightness_pct=brightness, color_name=color_name, kelvin=kelvin, rgb_color=rgb_color)
 
         def turn_off(self):
             self.previous = self.current
@@ -119,11 +118,10 @@ class Lights(hass.Hass):
                     self.parent.log("Restoring previous with a default ON strategy")
                     self.default_on_fn(self)
                 else:
-                    self.parent.turn_on(
-                        self.entity_id, 
-                        brightness_pct=self.previous["brightness_pct"],
-                        color_name=self.previous["color_name"],
-                        kelvin=self.previous["kelvin"],
+                    self.__turn_on__(
+                        brightness_pct=self.previous["brightness_pct"], 
+                        color_name=self.previous["color_name"], 
+                        kelvin=self.previous["kelvin"], 
                         rgb_color=self.previous["rgb_color"])
             else:
                 self.parent.turn_off(self.entity_id) 
@@ -133,6 +131,14 @@ class Lights(hass.Hass):
 
         def __get_all_previous_color_keys__(self):
             return [key for key in self.previous.keys() if key != "on"]
+
+        def __turn_on__(self, brightness_pct=None, color_name=None, rgb_color=None, kelvin=None):
+            if color_name is not None:
+                    self.parent.turn_on(self.entity_id, brightness_pct=brightness_pct, color_name=color_name)
+            elif rgb_color is not None:
+                self.parent.turn_on(self.entity_id, brightness_pct=brightness_pct, rgb_color=rgb_color)
+            elif kelvin is not None:
+                self.parent.turn_on(self.entity_id, brightness_pct=brightness_pct, kelvin=kelvin)
 
 class RepeatedTimer(object):
     def __init__(self, interval, total_duration, function, stop_cb, *args, **kwargs):
