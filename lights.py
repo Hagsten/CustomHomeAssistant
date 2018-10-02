@@ -133,12 +133,16 @@ class Lights(hass.Hass):
             return [key for key in self.previous.keys() if key != "on"]
 
         def __turn_on__(self, brightness_pct=None, color_name=None, rgb_color=None, kelvin=None):
+            brightness = brightness_pct if brightness_pct is not None else self.previous["brightness_pct"]
+
+            brightness = brightness if not None else "50"
+
             if color_name is not None:
-                    self.parent.turn_on(self.entity_id, brightness_pct=brightness_pct, color_name=color_name)
+                self.parent.turn_on(self.entity_id, brightness_pct=brightness, color_name=color_name)
             elif rgb_color is not None:
-                self.parent.turn_on(self.entity_id, brightness_pct=brightness_pct, rgb_color=rgb_color)
+                self.parent.turn_on(self.entity_id, brightness_pct=brightness, rgb_color=rgb_color)
             elif kelvin is not None:
-                self.parent.turn_on(self.entity_id, brightness_pct=brightness_pct, kelvin=kelvin)
+                self.parent.turn_on(self.entity_id, brightness_pct=brightness, kelvin=kelvin)
 
 class RepeatedTimer(object):
     def __init__(self, interval, total_duration, function, stop_cb, *args, **kwargs):
