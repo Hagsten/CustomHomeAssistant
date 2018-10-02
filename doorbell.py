@@ -7,7 +7,7 @@ class Doorbell(hass.Hass):
     timer = None
 
     def initialize(self):
-        self.asleep = self.get_app('asleep')
+        self.asleep = self.get_app('sleepy')
         self.lights = self.get_app('lights')
         self.listen_event(self.buttonListener, event="click", entity_id="binary_sensor.switch_doorbell")
         self.log("Doorbell app is running...")

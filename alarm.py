@@ -14,7 +14,7 @@ class Alarm(hass.Hass):
 
         self.last_triggered = None
 
-        self.app = self.get_app('asleep')
+        self.app = self.get_app('sleepy')
         self.utils = self.get_app('utils')
         self.lights = self.get_app('lights')
 
