@@ -30,7 +30,7 @@ class Lights(hass.Hass):
         light.toggle()
 
     def flash_lights_long(self, entity_id, color_name):
-        self.turn_on(entity_id, color_name=color_name)
+        self.on(entity_id, color_name=color_name)
 
         t = Timer(5, lambda: self.__done_flashing__(entity_id))
         t.start()
@@ -41,12 +41,12 @@ class Lights(hass.Hass):
         self.flash_lights("group.gateway_light_7811dcdf0cfa", 60, "red")
 
     def flash_lights(self, entity_id, duration, color_name):
-        self.turn_on(entity_id, color_name=color_name)
+        self.on(entity_id, color_name=color_name)
 
         RepeatedTimer(2, duration, self.__flash_lights__, self.__done_flashing__, entity_id)
 
     def __flash_lights__(self, entity_id):
-        self.toggle(entity_id)
+        self.toggle_light(entity_id)
 
     def __done_flashing__(self, entity_id):
         self.restore_previous(entity_id)
@@ -111,7 +111,7 @@ class Lights(hass.Hass):
         def restore_previous(self):
             prev_temp = self.previous
 
-            self.parent.log("Restoring previous...")
+            self.parent.log("Restoring previous...{}".format(self.previous))
             
             if self.previous["on"]:
                 if all(map(lambda x: self.previous[x] is None, self.__get_all_previous_color_keys__())):

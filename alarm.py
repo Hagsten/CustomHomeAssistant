@@ -28,6 +28,8 @@ class Alarm(hass.Hass):
     def shell_breached(self, entity, attribute, old, new, kwargs):
         self.log("Skalskyddet brutet. Info: {} \n {}".format(entity, attribute))
 
+        self.lights.flash_lights_long("group.tv_room_rgb_lights", "red")
+
         if not self.armed:
             return
 
