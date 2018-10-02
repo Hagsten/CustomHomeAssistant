@@ -30,7 +30,7 @@ class Lights(hass.Hass):
         light.toggle()
 
     def flash_lights_long(self, entity_id, color_name):
-        self.on(entity_id, color_name=color_name)
+        self.turn_on(entity_id, color_name=color_name)
 
         t = Timer(5, lambda: self.__done_flashing__(entity_id))
         t.start()
@@ -38,15 +38,15 @@ class Lights(hass.Hass):
     def alarm_flash(self):
         self.flash_lights("group.tv_room_rgb_lights", 60, "red")
         self.flash_lights("group.hallway_lights", 60, "red")
-        self.flash_lights("group.gateway_light_7811dcdf0cfa", 60, "red")
+        self.flash_lights("light.gateway_light_7811dcdf0cfa", 60, "red")
 
     def flash_lights(self, entity_id, duration, color_name):
-        self.on(entity_id, color_name=color_name)
+        self.turn_on(entity_id, color_name=color_name)
 
         RepeatedTimer(2, duration, self.__flash_lights__, self.__done_flashing__, entity_id)
 
     def __flash_lights__(self, entity_id):
-        self.toggle_light(entity_id)
+        self.toggle(entity_id)
 
     def __done_flashing__(self, entity_id):
         self.restore_previous(entity_id)
@@ -133,9 +133,7 @@ class Lights(hass.Hass):
             return [key for key in self.previous.keys() if key != "on"]
 
         def __turn_on__(self, brightness_pct=None, color_name=None, rgb_color=None, kelvin=None):
-            brightness = brightness_pct if brightness_pct is not None else self.previous["brightness_pct"]
-
-            brightness = brightness if not None else "50"
+            brightness = brightness_pct if brightness_pct is not None else self.previous.get("brightness_pct", "50")
 
             if color_name is not None:
                 self.parent.turn_on(self.entity_id, brightness_pct=brightness, color_name=color_name)
