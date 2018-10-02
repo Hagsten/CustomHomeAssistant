@@ -12,6 +12,8 @@ class Alarm(hass.Hass):
         self.listen_state(self.shell_breached, "group.house_shell", new="on") #Sensors that should be "off" when armed
         self.listen_state(self.shell_breached, "binary_sensor.door_window_sensor_158d00022f151e", new="on") #bedroom window which can be open while alarm is armed
 
+        #TODO: Add motion sensors as well
+
         self.last_triggered = None
 
         self.app = self.get_app('sleepy')
@@ -26,9 +28,8 @@ class Alarm(hass.Hass):
         self.log("Alarmsystem up and running. Is armed: {}".format(self.armed))
 
     def shell_breached(self, entity, attribute, old, new, kwargs):
-        self.log("Skalskyddet brutet. Info: {} \n {}".format(entity, attribute))
-
-        self.lights.flash_lights_long("group.tv_room_rgb_lights", "red")
+        #TODO: entity is the group. Find the last changed entity in the group
+        self.log("Skalskyddet brutet. Info: {}".format(entity))
 
         if not self.armed:
             return
@@ -38,13 +39,15 @@ class Alarm(hass.Hass):
 
         self.last_triggered = datetime.datetime.now()
 
+        self.utils.send_notification("Larm på väg att lösas ut", "Lets wait and see...")
+
         #Wait for 1 minute in case of "home"-delay
         Timer(60.0, timer_complete).start()
 
         def timer_complete(self):
             if not self.utils.anyone_home():
                 self.utils.send_notification("Larm utlöst", "Sensor: {}".format(entity))
-                self.lights.alarm_flash()
+                #self.lights.alarm_flash()
             else:
                 self.log("Någon hann komma hem innan larmet utlöstes...")
 
@@ -60,7 +63,7 @@ class Alarm(hass.Hass):
 
         self.armed = True
         self.utils.send_notification("Larm aktiverat", "Larmet är aktivt")
-        self.lights.flash_lights_long("group.all_lights", "red")
+        self.lights.flash_lights_long("light.gateway_light_7811dcdf0cfa", "red")
 
     def disarm(self):
         if not self.armed:
@@ -68,4 +71,4 @@ class Alarm(hass.Hass):
 
         self.armed = False
         self.utils.send_notification("Larm deaktiverat", "Larmet är ej aktivt")
-        self.lights.flash_lights_long("group.all_lights", "green")
+        self.lights.flash_lights_long("light.gateway_light_7811dcdf0cfa", "green")

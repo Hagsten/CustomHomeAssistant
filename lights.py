@@ -74,8 +74,6 @@ class Lights(hass.Hass):
             parent.listen_state(self.light_changed, entity_id)
 
         def light_changed(self, entity, attribute, old, new, kwargs):
-            self.parent.log("Light changed: Old: {}, New: {}, Attribute: {}".format(old, new, attribute))
-
             self.previous["on"] = old == "on"
             self.current["on"] = new == "on"
 
@@ -89,8 +87,6 @@ class Lights(hass.Hass):
                 "rgb_color": rgb_color,
                 "on": True
             }
-
-            self.parent.log("EntityId: {}: current value {}".format(self.entity_id, self.current))
 
             self.__turn_on__(brightness_pct=brightness, color_name=color_name, kelvin=kelvin, rgb_color=rgb_color)
 
