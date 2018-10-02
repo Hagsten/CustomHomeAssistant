@@ -63,5 +63,5 @@ class TvRoomMotion(hass.Hass):
     if self.get_state("media_player.vardagsrum").lower() == "off":
       return
 
-    self.lights.turn_off("group.tv_room_rgb_lights")
+    self.lights.off("group.tv_room_rgb_lights")
 

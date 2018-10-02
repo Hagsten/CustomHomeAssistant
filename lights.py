@@ -4,17 +4,17 @@ from threading import Timer
 class Lights(hass.Hass):
     def initialize(self):
         self.lights = {
-            "group.tv_room_rgb_lights" : Lights.Light(self, "group.tv_ronm_rgb_lights", self.__tv_room_rgb_default__),
+            "group.tv_room_rgb_lights" : Lights.Light(self, "group.tv_room_rgb_lights", self.__tv_room_rgb_default__),
             "group.hallway_lights" : Lights.Light(self, "group.hallway_lights", self.__hallway_default__),
             "light.gateway_light_7811dcdf0cfa" : Lights.Light(self, "light.gateway_light_7811dcdf0cfa", self.__gateway_default__)
         }
 
-    def turn_on(self, entity_id, brightness=None, color_name=None):
+    def on(self, entity_id, brightness_pct=None, color_name=None, kelvin=None):
         light = self.lights[entity_id]
 
-        light.turn_on(brightness, color_name)
+        light.turn_on(brightness_pct, color_name, kelvin)
 
-    def turn_off(self, entity_id):
+    def off(self, entity_id):
         light = self.lights[entity_id]
 
         light.turn_off()
@@ -24,7 +24,7 @@ class Lights(hass.Hass):
 
         light.restore_previous()
 
-    def toggle(self, entity_id):
+    def toggle_light(self, entity_id):
         light = self.lights[entity_id]
 
         light.toggle()
@@ -90,9 +90,10 @@ class Lights(hass.Hass):
                 "on": True
             }
 
-            self.parent.turn_on(self.entity_id, brightness_pct=brightness, color_name=color_name, kelvin=kelvin, rgb_color=rgb_color)
-            
             self.parent.log("EntityId: {}: current value {}".format(self.entity_id, self.current))
+            #TODO: fix rgb_color
+            self.parent.turn_on(self.entity_id, brightness_pct=brightness, color_name=color_name, kelvin=kelvin)
+            
 
         def turn_off(self):
             self.previous = self.current

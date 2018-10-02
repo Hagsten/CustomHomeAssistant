@@ -18,7 +18,7 @@ class Doorbell(hass.Hass):
         else:
             self.call_service("script/1537340978223", ringtone=10, volume=50)
 
-        self.lights.turn_on("group.hallway_lights")
+        self.lights.on("group.hallway_lights")
 
         if self.timer is not None:
             self.timer.cancel()
@@ -31,4 +31,4 @@ class Doorbell(hass.Hass):
 
     def turnOffLights(self):
         self.log("turning lights off...")
-        self.lights.turn_off("group.hallway_lights")
+        self.lights.off("group.hallway_lights")

@@ -38,7 +38,7 @@ class TvRoomSwitch(hass.Hass):
     def handleDoubleClick(self):
         self.log("Handle double click...")
         
-        self.lights.turn_on("group.tv_room_rgb_lights", color_name=self.colors[self.colorCounter])
+        self.lights.on("group.tv_room_rgb_lights", color_name=self.colors[self.colorCounter])
 
         self.colorCounter = self.colorCounter + 1 if self.colorCounter < len(self.colors) - 1 else 0
 
@@ -71,16 +71,16 @@ class TvRoomSwitch(hass.Hass):
 
         if(self.counter == 0):
             self.log("turning off")
-            self.lights.turn_off("group.tv_room_rgb_lights")
+            self.lights.off("group.tv_room_rgb_lights")
         else:
             self.log(brightnesses[self.counter])
-            self.lights.turn_on("group.tv_room_rgb_lights", brightness_pct=brightnesses[self.counter], kelvin=3000)
+            self.lights.on("group.tv_room_rgb_lights", brightness_pct=brightnesses[self.counter], kelvin=3000)
 
     def handleOnOff(self):
         if self.get_state("group.tv_room_rgb_lights") == "off":
-            self.lights.turn_on("group.tv_room_rgb_lights", brightness_pct="100", kelvin=3000)
+            self.lights.on("group.tv_room_rgb_lights", brightness_pct="100", kelvin=3000)
         else:
-            self.lights.turn_off("group.tv_room_rgb_lights")
+            self.lights.off("group.tv_room_rgb_lights")
 
     def handleCozy(self):
         self.handleDimmableStrategies(["0", "10", "50", "100"])
