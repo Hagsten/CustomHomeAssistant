@@ -76,7 +76,11 @@ class Alarm(hass.Hass):
         if entity_id.startswith("group."):
             entities_in_group = [self.get_state(x, attribute="all") for x in self.get_state(entity_id, attribute="entity_id")]
         
-            return sorted(entities_in_group, key=lambda x: x['last_changed'], reverse=True)[0]['entity_id']
-        
+            candidate = sorted(entities_in_group, key=lambda x: x['last_changed'], reverse=True)[0]['entity_id']
+
+            if candidate.startswith("group."):
+                return self.__get_entity_thet_caused_trigger__(candidate)
+
+            return candidate
         
         return entity_id
