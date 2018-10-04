@@ -11,8 +11,8 @@ class Lights(hass.Hass):
 
         self.listen_event(self.__ga_listener__, "lights_on")
 
-    def __ga_listener__(self, entity, attribute, old, new, kwargs):
-        self.log("{} \n {} \n {} \n {} \n {} \n".format(entity, attribute, old, new, kwargs))
+    def __ga_listener__(self, event_name, data, foo):
+        self.log("{} \n {} \n {} \n".format(event_name, data, foo))
 
     def on(self, entity_id, brightness_pct=None, color_name=None, kelvin=None):
         light = self.lights[entity_id]
