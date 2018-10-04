@@ -81,6 +81,6 @@ class Alarm(hass.Hass):
             if candidate['entity_id'].startswith("group."):
                 return self.__get_entity_thet_caused_trigger__(candidate['entity_id'])
 
-            return candidate['friendly_name']
+            return candidate['attributes']['friendly_name']
         
         return entity_id
