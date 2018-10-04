@@ -9,10 +9,22 @@ class Lights(hass.Hass):
             "light.gateway_light_7811dcdf0cfa" : Lights.Light(self, "light.gateway_light_7811dcdf0cfa", self.__gateway_default__)
         }
 
-        self.listen_event(self.__ga_listener__, "lights_on")
+        self.listen_event(self.__ga_onoff_listener__, "lights_onoff")
+        self.listen_event(self.__ga_mode_listener__, "lights_mode")
 
-    def __ga_listener__(self, event_name, data, foo):
-        self.log("{} \n {} \n {} \n".format(event_name, data, foo))
+    def __ga_onoff_listener__(self, event_name, data, foo):
+        self.log("Onoff: {} \n {} \n {} \n".format(event_name, data, foo))
+
+        light = self.lights["group.tv_room_rgb_lights"]
+
+        if data['state'] == 'on':
+            self.__tv_room_rgb_default__(light)
+        else:
+            light.turn_off()
+    
+    def __ga_mode_listener__(self, event_name, data, foo):
+        #'foo': 'cozy'
+        self.log("Mode: {} \n {} \n {} \n".format(event_name, data, foo))
 
     def on(self, entity_id, brightness_pct=None, color_name=None, kelvin=None):
         light = self.lights[entity_id]
