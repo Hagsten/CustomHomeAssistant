@@ -13,7 +13,7 @@ class Doorbell(hass.Hass):
         self.log("Doorbell app is running...")
 
     def buttonListener(self, event_name, data, foo):
-        if self.asleep.is_asleep:
+        if self.asleep.asleep:
             self.call_service("script/1537340978223", ringtone=10, volume=10)
         else:
             self.call_service("script/1537340978223", ringtone=10, volume=50)

@@ -60,7 +60,7 @@ class TvRoomMotion(hass.Hass):
     self.log("Timer complete, trying to turn off lights...")
     self.log(self.get_state("media_player.vardagsrum"))
 
-    if self.get_state("media_player.vardagsrum").lower() == "off":
+    if self.get_state("media_player.vardagsrum").lower() != "off":
       return
 
     self.lights.off("group.tv_room_rgb_lights")

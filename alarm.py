@@ -9,10 +9,9 @@ class Alarm(hass.Hass):
         self.listen_state(self.comingHome, "group.trusted_people", new = "home")
 
         #TODO: If the state triggers to "on" even if it is already "on" then I do not need the 2nd listener. Investigate...
-        self.listen_state(self.shell_breached, "group.house_shell", new="on") #Sensors that should be "off" when armed
-        self.listen_state(self.shell_breached, "binary_sensor.door_window_sensor_158d00022f151e", new="on") #bedroom window which can be open while alarm is armed
-
-        #TODO: Add motion sensors as well
+        self.listen_state(self.trigger_alarm, "group.house_shell", new="on") #Sensors that should be "off" when armed
+        self.listen_state(self.trigger_alarm, "binary_sensor.door_window_sensor_158d00022f151e", new="on") #bedroom window which can be open while alarm is armed
+        self.listen_state(self.trigger_alarm, "group.motion_sensors", new="on")
 
         self.last_triggered = None
 
@@ -27,10 +26,10 @@ class Alarm(hass.Hass):
 
         self.log("Alarmsystem up and running. Is armed: {}".format(self.armed))
 
-    def shell_breached(self, entity, attribute, old, new, kwargs):
-        #TODO: entity is the group. Find the last changed entity in the group
-        self.log("Skalskyddet brutet. Info: {}".format(entity))
-
+    def trigger_alarm(self, entity, attribute, old, new, kwargs):
+        triggered_entity = self.__get_entity_thet_caused_trigger__(entity)
+        self.log("Alarm about to be triggered. Info: {}".format(triggered_entity))
+        
         if not self.armed:
             return
 
@@ -39,14 +38,14 @@ class Alarm(hass.Hass):
 
         self.last_triggered = datetime.datetime.now()
 
-        self.utils.send_notification("Larm på väg att lösas ut", "Lets wait and see...")
+        self.utils.send_notification("Larm på väg att lösas ut", "Orsak: {}".format(triggered_entity))
 
         #Wait for 1 minute in case of "home"-delay
         Timer(60.0, timer_complete).start()
 
         def timer_complete(self):
             if not self.utils.anyone_home():
-                self.utils.send_notification("Larm utlöst", "Sensor: {}".format(entity))
+                self.utils.send_notification("Larm utlöst", "Sensor: {}".format(triggered_entity))
                 #self.lights.alarm_flash()
             else:
                 self.log("Någon hann komma hem innan larmet utlöstes...")
@@ -72,3 +71,12 @@ class Alarm(hass.Hass):
         self.armed = False
         self.utils.send_notification("Larm deaktiverat", "Larmet är ej aktivt")
         self.lights.flash_lights_long("light.gateway_light_7811dcdf0cfa", "green")
+
+    def __get_entity_thet_caused_trigger__(self, entity_id):
+        if entity_id.startswith("group."):
+            entities_in_group = [self.get_state(x, attribute="all") for x in self.get_state(entity_id, attribute="entity_id")]
+        
+            return sorted(entities_in_group, key=lambda x: x['last_changed'], reverse=True)[0]['entity_id']
+        
+        
+        return entity_id

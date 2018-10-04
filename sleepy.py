@@ -2,14 +2,14 @@ import appdaemon.plugins.hass.hassapi as hass
 import datetime
 
 class Sleepy(hass.Hass):
-    wentToSleepSubscribers = {}
-    wokeUpSubscribers = {}
-
     def initialize(self):
         self.utils = self.get_app('utils')
         
         self.listen_state(self.handleMotionCleared, "binary_sensor.motion_sensor_upper_floor", new = "off")
         self.listen_state(self.handleMotionDetected, "group.motion_sensors", new = "on")
+
+        self.wentToSleepSubscribers = {}
+        self.wokeUpSubscribers = {}
 
         #Listen to a IFTTT battery charging event. If the below conditions are met + battery is charging then apply a more offensive strategy (the current)
         #else wait at least double the time to activate the alarm
@@ -62,7 +62,6 @@ class Sleepy(hass.Hass):
                 self.wokeUpSubscribers[key]()
 
     def registerWentToSleep(self, key, cb):
-        self.log(self.wentToSleepSubscribers)
         self.wentToSleepSubscribers[key] = cb
 
     def registerWokeUp(self, key, cb):
