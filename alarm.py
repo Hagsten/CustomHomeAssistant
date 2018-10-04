@@ -8,7 +8,6 @@ class Alarm(hass.Hass):
         self.listen_state(self.leavingHome, "group.trusted_people", new = "not_home")
         self.listen_state(self.comingHome, "group.trusted_people", new = "home")
 
-        #TODO: If the state triggers to "on" even if it is already "on" then I do not need the 2nd listener. Investigate...
         self.listen_state(self.trigger_alarm, "group.house_shell", new="on") #Sensors that should be "off" when armed
         self.listen_state(self.trigger_alarm, "binary_sensor.door_window_sensor_158d00022f151e", new="on") #bedroom window which can be open while alarm is armed
         self.listen_state(self.trigger_alarm, "group.motion_sensors", new="on")
@@ -28,6 +27,7 @@ class Alarm(hass.Hass):
 
     def trigger_alarm(self, entity, attribute, old, new, kwargs):
         triggered_entity = self.__get_entity_thet_caused_trigger__(entity)
+        
         self.log("Alarm about to be triggered. Info: {}".format(triggered_entity))
         
         if not self.armed:

@@ -9,6 +9,11 @@ class Lights(hass.Hass):
             "light.gateway_light_7811dcdf0cfa" : Lights.Light(self, "light.gateway_light_7811dcdf0cfa", self.__gateway_default__)
         }
 
+        self.listen_event(self.__ga_listener__, "lights_on")
+
+    def __ga_listener__(self, entity, attribute, old, new, kwargs):
+        self.log("{} \n {} \n {} \n {} \n {} \n".format(entity, attribute, old, new, kwargs))
+
     def on(self, entity_id, brightness_pct=None, color_name=None, kelvin=None):
         light = self.lights[entity_id]
 
