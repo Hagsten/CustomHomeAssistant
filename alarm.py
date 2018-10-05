@@ -26,9 +26,7 @@ class Alarm(hass.Hass):
         self.log("Alarmsystem up and running. Is armed: {}".format(self.armed))
 
     def trigger_alarm(self, entity, attribute, old, new, kwargs):
-        triggered_entity = self.__get_entity_thet_caused_trigger__(entity)
-        
-        self.log("Alarm about to be triggered. Info: {}".format(triggered_entity))
+        triggered_entity = self.__get_entity_thet_caused_trigger__(entity)       
         
         if not self.armed:
             return
@@ -38,8 +36,8 @@ class Alarm(hass.Hass):
 
         self.last_triggered = datetime.datetime.now()
 
+        self.log("Alarm about to be triggered. Info: {}".format(triggered_entity))
         self.utils.send_notification("Larm på väg att lösas ut", "Orsak: {}".format(triggered_entity))
-
 
         def timer_complete(self):
             if not self.utils.anyone_home():
