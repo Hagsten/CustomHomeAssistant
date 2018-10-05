@@ -25,7 +25,7 @@ class Lights(hass.Hass):
 
         light = self.lights["group.tv_room_rgb_lights"]
 
-        state = data.get('state', "full")
+        state = data.get('mode', "full")
 
         if state == "full":
             light.turn_on("100", kelvin=3000)
