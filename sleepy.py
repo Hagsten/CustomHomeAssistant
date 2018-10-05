@@ -22,9 +22,11 @@ class Sleepy(hass.Hass):
 
     def handleMotionCleared(self, event_name, data, foo, bar, baz):
         if not self.utils.anyone_home():
+            self.log("No one home")
             return
 
         if self.asleep:
+            self.log("Already asleep")
             return
 
         if datetime.datetime.now().hour >= 7 and datetime.datetime.now().hour <= 19:
@@ -33,9 +35,11 @@ class Sleepy(hass.Hass):
         sortedSensors = self.getMotionSensors()
         
         if not all(sensor['state'] == 'off' for sensor in sortedSensors):
+            self.log("Not all sensors are off")
             return
 
         if not (sortedSensors[0]['entity_id'] == "binary_sensor.motion_sensor_upper_floor" and int(sortedSensors[0]['attributes']['No motion since']) >= 900):
+            self.log("Not the correct orrder or enough time")
             return
 
         self.log("Calling went to sleep subscribers...")

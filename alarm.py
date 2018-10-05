@@ -40,8 +40,6 @@ class Alarm(hass.Hass):
 
         self.utils.send_notification("Larm på väg att lösas ut", "Orsak: {}".format(triggered_entity))
 
-        #Wait for 1 minute in case of "home"-delay
-        Timer(60.0, timer_complete).start()
 
         def timer_complete(self):
             if not self.utils.anyone_home():
@@ -49,6 +47,9 @@ class Alarm(hass.Hass):
                 #self.lights.alarm_flash()
             else:
                 self.log("Någon hann komma hem innan larmet utlöstes...")
+
+        #Wait for 1 minute in case of "home"-delay
+        Timer(60.0, timer_complete).start()
 
     def leavingHome(self, entity, attribute, old, new, kwargs):
         self.arm()
