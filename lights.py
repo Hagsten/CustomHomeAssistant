@@ -13,8 +13,6 @@ class Lights(hass.Hass):
         self.listen_event(self.__ga_mode_listener__, "lights_mode")
 
     def __ga_onoff_listener__(self, event_name, data, foo):
-        self.log("Onoff: {} \n {} \n {} \n".format(event_name, data, foo))
-
         light = self.lights["group.tv_room_rgb_lights"]
 
         if data['state'] == 'on':
@@ -23,8 +21,18 @@ class Lights(hass.Hass):
             light.turn_off()
     
     def __ga_mode_listener__(self, event_name, data, foo):
-        #'foo': 'cozy'
         self.log("Mode: {} \n {} \n {} \n".format(event_name, data, foo))
+
+        light = self.lights["group.tv_room_rgb_lights"]
+
+        state = data.get('state', "full")
+
+        if state == "full":
+            light.turn_on("100", kelvin=3000)
+        elif state == "cozy":
+            light.turn_on("10", kelvin=3000)
+        elif state == "normal":
+            light.turn_on("50", kelvin=3000)    
 
     def on(self, entity_id, brightness_pct=None, color_name=None, kelvin=None):
         light = self.lights[entity_id]

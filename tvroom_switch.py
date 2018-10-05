@@ -69,7 +69,9 @@ class TvRoomSwitch(hass.Hass):
 
     def handleOnOff(self):
         if self.get_state("group.tv_room_rgb_lights") == "off":
-            self.lights.on("group.tv_room_rgb_lights", brightness_pct="100", kelvin=3000)
+            brightnesses = "100" if datetime.datetime.now().hour > 6 else "10"
+            
+            self.lights.on("group.tv_room_rgb_lights", brightness_pct=brightnesses, kelvin=3000)
         else:
             self.lights.off("group.tv_room_rgb_lights")
 
