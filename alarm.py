@@ -31,7 +31,7 @@ class Alarm(hass.Hass):
         if not self.armed:
             return
 
-        if self.last_triggered is not None and (datetime.datetime.now() - self.last_triggered).total_seconds < 900:
+        if self.last_triggered is not None and (datetime.datetime.now() - self.last_triggered).total_seconds() < 900:
             return
 
         self.last_triggered = datetime.datetime.now()
