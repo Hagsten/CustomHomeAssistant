@@ -32,14 +32,8 @@ class Sleepy(hass.Hass):
         if datetime.datetime.now().hour >= 7 and datetime.datetime.now().hour <= 19:
             return
 
-        sortedSensors = self.getMotionSensors()
-        
-        if not all(sensor['state'] == 'off' for sensor in sortedSensors):
-            self.log("Not all sensors are off")
-            return
-
-        if not (sortedSensors[0]['entity_id'] == "binary_sensor.motion_sensor_upper_floor" and int(sortedSensors[0]['attributes']['No motion since']) >= 900):
-            self.log("Not the correct orrder or enough time")
+        if not self.__is_sleeping__():
+            self.log("Not sleeping...")
             return
 
         self.log("Calling went to sleep subscribers...")
@@ -75,3 +69,29 @@ class Sleepy(hass.Hass):
         motionSensors = [self.get_state(x, attribute="all") for x in self.get_state("group.motion_sensors", attribute="entity_id")]
         
         return sorted(motionSensors, key=lambda x: x['last_changed'], reverse=True)
+
+    def __is_sleeping__(self):
+        sortedSensors = self.getMotionSensors()
+        
+        if not all(sensor['state'] == 'off' for sensor in sortedSensors):
+            self.log("Not all sensors are off")
+            return False
+        
+        if sortedSensors[0]['entity_id'] == "binary_sensor.motion_sensor_upper_floor" and int(sortedSensors[0]['attributes']['No motion since']) >= 900:
+            return True
+
+        noMotionSince = 0
+
+        self.log("Check whether no motion since is redundant...")
+
+        for sensor in sortedSensors:
+            if sensor['entity_id'] == "binary_sensor.motion_sensor_upper_floor":
+                diff = int(sensor['attributes']['No motion since']) - noMotionSince
+
+                self.log("Diff is {}".format(diff))
+
+                return diff <= 180
+
+            noMotionSince = int(sensor['attributes']['No motion since'])
+
+        return False

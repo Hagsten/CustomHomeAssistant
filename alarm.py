@@ -39,15 +39,9 @@ class Alarm(hass.Hass):
         self.log("Alarm about to be triggered. Info: {}".format(triggered_entity))
         self.utils.send_notification("Larm på väg att lösas ut", "Orsak: {}".format(triggered_entity))
 
-        def timer_complete(self):
-            if not self.utils.anyone_home():
-                self.utils.send_notification("Larm utlöst", "Sensor: {}".format(triggered_entity))
-                #self.lights.alarm_flash()
-            else:
-                self.log("Någon hann komma hem innan larmet utlöstes...")
-
         #Wait for 1 minute in case of "home"-delay
-        Timer(60.0, timer_complete).start()
+        t = Timer(60.0, self.__alarm_timer_complete__)
+        t.start()
 
     def leavingHome(self, entity, attribute, old, new, kwargs):
         self.arm()
@@ -83,3 +77,10 @@ class Alarm(hass.Hass):
             return candidate['attributes']['friendly_name']
         
         return entity_id
+
+    def __alarm_timer_complete__(self):
+        if not self.utils.anyone_home():
+            self.utils.send_notification("Larm utlöst", "Sensor: {}".format("placeholder")) #TODO: pass args in timer. Investigate how
+            #self.lights.alarm_flash()
+        else:
+            self.log("Någon hann komma hem innan larmet utlöstes...")
