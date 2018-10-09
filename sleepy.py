@@ -85,13 +85,15 @@ class Sleepy(hass.Hass):
         self.log("Check whether no motion since is redundant...")
 
         for sensor in sortedSensors:
+            motion = int(sensor['attributes']['No motion since'])
+
             if sensor['entity_id'] == "binary_sensor.motion_sensor_upper_floor":
-                diff = int(sensor['attributes']['No motion since']) - noMotionSince
+                diff = motion - noMotionSince
 
                 self.log("Diff is {}".format(diff))
 
-                return diff <= 180
+                return motion >= 900 and diff <= 180
 
-            noMotionSince = int(sensor['attributes']['No motion since'])
+            noMotionSince = motion
 
         return False

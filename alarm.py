@@ -79,7 +79,7 @@ class Alarm(hass.Hass):
         return entity_id
 
     def __alarm_timer_complete__(self):
-        if not self.utils.anyone_home():
+        if self.armed:
             self.utils.send_notification("Larm utlöst", "Sensor: {}".format("placeholder")) #TODO: pass args in timer. Investigate how
             #self.lights.alarm_flash()
         else:
