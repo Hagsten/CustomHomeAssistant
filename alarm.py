@@ -12,6 +12,8 @@ class Alarm(hass.Hass):
         self.listen_state(self.trigger_alarm, "binary_sensor.door_window_sensor_158d00022f151e", new="on") #bedroom window which can be open while alarm is armed
         self.listen_state(self.trigger_alarm, "group.motion_sensors", new="on")
 
+        self.listen_state(self.manual_arming, "input_boolean.alarm_state", new="on")
+
         self.last_triggered = None
 
         self.app = self.get_app('sleepy')
@@ -42,6 +44,9 @@ class Alarm(hass.Hass):
         #Wait for 1 minute in case of "home"-delay
         t = Timer(60.0, self.__alarm_timer_complete__)
         t.start()
+
+    def manual_arming(self, entity, attribute, old, new, kwargs):
+        self.log("Manual arming done!")
 
     def leavingHome(self, entity, attribute, old, new, kwargs):
         self.arm()
