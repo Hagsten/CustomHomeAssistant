@@ -24,7 +24,7 @@ class Alarm(hass.Hass):
         self.app.registerWentToSleep("alarm_app" ,self.arm)
         self.app.registerWokeUp("alarm_app", self.disarm)
 
-        self.armed = self.utils.anyone_home() == False or self.app.asleep
+        self.armed = self.get_state("input_boolean.alarm_state") == "on" or (self.utils.anyone_home() == False or self.app.asleep)
 
         self.manualArmingTimer = None
 
@@ -59,6 +59,7 @@ class Alarm(hass.Hass):
 
     def manual_disarming(self, entity, attribute, old, new, kwargs):
         self.log("Disarmed manually")
+        
         self.disarm()
 
     def leavingHome(self, entity, attribute, old, new, kwargs):
@@ -72,14 +73,19 @@ class Alarm(hass.Hass):
             return
 
         self.armed = True
+        self.set_state("input_boolean.alarm_state", state="on")
         self.utils.send_notification("Larm aktiverat", "Larmet är aktivt")
         self.lights.flash_lights_long("light.gateway_light_7811dcdf0cfa", "red")
 
     def disarm(self):
+        if self.manualArmingTimer is not None:
+            self.manualArmingTimer.cancel()
+        
         if not self.armed:
             return
 
         self.armed = False
+        self.set_state("input_boolean.alarm_state", state="off")
         self.utils.send_notification("Larm deaktiverat", "Larmet är ej aktivt")
         self.lights.flash_lights_long("light.gateway_light_7811dcdf0cfa", "green")
 
