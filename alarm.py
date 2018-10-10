@@ -13,6 +13,7 @@ class Alarm(hass.Hass):
         self.listen_state(self.trigger_alarm, "group.motion_sensors", new="on")
 
         self.listen_state(self.manual_arming, "input_boolean.alarm_state", new="on")
+        self.listen_state(self.manual_disarming, "input_boolean.alarm_state", new="off")
 
         self.last_triggered = None
 
@@ -24,6 +25,8 @@ class Alarm(hass.Hass):
         self.app.registerWokeUp("alarm_app", self.disarm)
 
         self.armed = self.utils.anyone_home() == False or self.app.asleep
+
+        self.manualArmingTimer = None
 
         self.log("Alarmsystem up and running. Is armed: {}".format(self.armed))
 
@@ -46,7 +49,17 @@ class Alarm(hass.Hass):
         t.start()
 
     def manual_arming(self, entity, attribute, old, new, kwargs):
-        self.log("Manual arming done!")
+        self.log("Alarm will be armed in 2 minutes")
+
+        if self.manualArmingTimer is not None:
+            self.manualArmingTimer.cancel()
+
+        self.manualArmingTimer = Timer(120.0, self.arm)
+        self.manualArmingTimer.start()
+
+    def manual_disarming(self, entity, attribute, old, new, kwargs):
+        self.log("Disarmed manually")
+        self.disarm()
 
     def leavingHome(self, entity, attribute, old, new, kwargs):
         self.arm()
