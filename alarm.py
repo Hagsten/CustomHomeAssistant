@@ -82,6 +82,8 @@ class Alarm(hass.Hass):
 
         self.armed = False
         self.set_state("input_boolean.alarm_state", state="off")
+        self.set_state("input_boolean.alarm_triggered", state="off")
+
         self.utils.send_notification("Larm deaktiverat", "Larmet är ej aktivt")
         self.lights.flash_lights_long("light.gateway_light_7811dcdf0cfa", "green")
 
@@ -101,6 +103,7 @@ class Alarm(hass.Hass):
     def __alarm_timer_complete__(self):
         if self.armed:
             self.utils.send_notification("Larm utlöst", "Sensor: {}".format("placeholder")) #TODO: pass args in timer. Investigate how
+            self.set_state("input_boolean.alarm_triggered", state="on")
             #self.lights.alarm_flash()
         else:
             self.log("Någon hann komma hem innan larmet utlöstes...")
