@@ -49,13 +49,9 @@ class Alarm(hass.Hass):
         t.start()
 
     def manual_arming(self, entity, attribute, old, new, kwargs):
-        self.log("Alarm will be armed in 2 minutes")
+        self.log("Armed manually")
 
-        if self.manualArmingTimer is not None:
-            self.manualArmingTimer.cancel()
-
-        self.manualArmingTimer = Timer(120.0, self.arm)
-        self.manualArmingTimer.start()
+        self.arm()
 
     def manual_disarming(self, entity, attribute, old, new, kwargs):
         self.log("Disarmed manually")
